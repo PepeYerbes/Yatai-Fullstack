@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import User from "../models/user.js";
 
 // Obtener perfil del usuario autenticado
@@ -116,15 +116,25 @@ const changePassword = async (req, res, next) => {
     const userId = req.user.userId;
     const { currentPassword, newPassword } = req.body;
 
+    // Validar que currentPassword esté presente
+    if (!currentPassword) {
+      return res.status(400).json({ message: "Se requiere la contraseña actual" });
+    }
+
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: "Usuario no encontrado" });
+    }
+
+    // Validar que hashPassword exista
+    if (!user.hashPassword) {
+      return res.status(500).json({ message: "La contraseña del usuario no está definida en la base de datos" });
     }
 
     // Verificar contraseña actual
     const isMatch = await bcrypt.compare(currentPassword, user.hashPassword);
     if (!isMatch) {
-      return res.status(400).json({ message: "Current password is incorrect" });
+      return res.status(400).json({ message: "Contraseña actual incorrecta" });
     }
 
     // Hash nueva contraseña
@@ -135,13 +145,13 @@ const changePassword = async (req, res, next) => {
     await user.save();
 
     res.status(200).json({
-      message: "Password changed successfully",
+      message: "Contraseña actualizada correctamente",
     });
   } catch (error) {
+    console.error('Error en changePassword:', error);
     next(error);
   }
 };
-
 // Actualizar usuario (solo admin)
 const updateUser = async (req, res, next) => {
   try {

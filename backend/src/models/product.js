@@ -16,16 +16,18 @@ const productSchema = new mongoose.Schema({
     required: true,
     min: 1,
   },
+  
+  imagesUrl: {
+    type: String,
+    default: 'https://placehold.co/800x600.png',
+    trim: true,
+  },
+  
   stock: {
     type: Number,
     required: true,
     min: 0,
   },
-  imagesUrl: [{
-    type: String,
-    default: 'https://placehold.co/800x600.png',
-    trim: true,
-  }],
   category: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Category',

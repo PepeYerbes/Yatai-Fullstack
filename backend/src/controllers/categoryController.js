@@ -24,21 +24,27 @@ async function getCategoryById(req, res) {
     next(error);
   }
 }
-async function createCategory(req, res) {
+async function createCategory (req, res, next) {
   try {
-    const { name, description, parentCategory, imageURL } = req.body;
-    const newCategory = new Category({
-      name,
-      description,
-      parentCategory: parentCategory || null,
-      imageURL: imageURL || null,
+    const { name, description } = req.body;
+
+    // Validar que el nombre esté presente
+    if (!name) {
+      return res.status(400).json({ message: 'El nombre de la categoría es requerido' });
+    }
+
+    const category = new Category({ name, description });
+    await category.save();
+
+    res.status(201).json({
+      message: 'Categoría creada correctamente',
+      category
     });
-    await newCategory.save();
-    res.status(201).json(newCategory);
   } catch (error) {
-    next(error);
+    console.error('Error en createCategory:', error);
+    next(error); 
   }
-}
+};
 async function updateCategory(req, res) {
   try {
     const { name, description, parentCategory, imageURL } = req.body;
