@@ -74,11 +74,13 @@ const orderSchema = new mongoose.Schema({
         required: true,
         trim: true,
     },
+
     shippingAddress: {
-        type: String,
-        required: true,
-        trim: true,
-    },
+  street: { type: String, required: true },
+  city: { type: String, required: true },
+  country: { type: String, required: true },
+  postalCode: { type: String, required: true }
+},
     contactPhone: {
         type: String,
         required: true,
